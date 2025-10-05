@@ -15,11 +15,16 @@ export function PWAInstallPrompt() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [isStandalone, setIsStandalone] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
     // Check if it's iOS
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     setIsIOS(iOS)
+
+    // Check if it's desktop
+    const desktop = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    setIsDesktop(desktop)
 
     // Check if already installed (standalone mode)
     const standalone = window.matchMedia('(display-mode: standalone)').matches
@@ -90,7 +95,9 @@ export function PWAInstallPrompt() {
                   <p className="text-sm text-muted-foreground">
                     {isIOS 
                       ? "Add to home screen for a native app experience"
-                      : "Install for quick access and offline use"
+                      : isDesktop
+                      ? "Install as a desktop app for better performance"
+                      : "Install for quick access and native app feel"
                     }
                   </p>
                 </div>
