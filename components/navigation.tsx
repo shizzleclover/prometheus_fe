@@ -20,7 +20,7 @@ export function Navigation() {
     >
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-accent border-4 border-foreground flex items-center justify-center brutalist-shadow-sm">
+          <div className="w-10 h-10 border-4 border-foreground flex items-center justify-center brutalist-shadow-sm" style={{ backgroundColor: '#FF00FF' }}>
             <Flame className="w-6 h-6 text-foreground" />
           </div>
           <span className="text-2xl font-black tracking-tight">PROMETHEUS</span>

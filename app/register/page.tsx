@@ -55,7 +55,7 @@ export default function RegisterPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="bg-card border-4 border-foreground brutalist-shadow-lg p-8">
           <div className="flex items-center justify-center mb-8">
-            <div className="w-16 h-16 bg-accent border-4 border-foreground flex items-center justify-center brutalist-shadow-sm">
+            <div className="w-16 h-16 border-4 border-foreground flex items-center justify-center brutalist-shadow-sm" style={{ backgroundColor: '#FF00FF' }}>
               <Flame className="w-10 h-10 text-foreground" />
             </div>
           </div>

@@ -1,11 +1,11 @@
 <svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background -->
-  <rect width="192" height="192" fill="#000000"/>
+  <!-- Outer black square border -->
+  <rect x="0" y="0" width="192" height="192" fill="#000000"/>
   
-  <!-- Main icon area -->
-  <rect x="16" y="16" width="160" height="160" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+  <!-- Inner pink square background -->
+  <rect x="4" y="4" width="184" height="184" fill="#FF00FF"/>
   
-  <!-- Flame icon -->
+  <!-- Flame icon (black outline) -->
   <svg x="48" y="48" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2">
     <path d="M12 2c5.5 0 10 4.5 10 10s-4.5 10-10 10S2 17.5 2 12S6.5 2 12 2z"/>
     <path d="M12 6v6l4 4"/>

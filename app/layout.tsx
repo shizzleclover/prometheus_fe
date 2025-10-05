@@ -7,6 +7,7 @@ import "./globals.css"
 import { AuthProvider } from "@/lib/auth-context"
 import { ThemeProvider } from "@/lib/theme-provider"
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
+import { AppInitializer } from "@/components/app-initializer"
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
     title: "Prometheus",
   },
   icons: {
-    icon: "/icon-192x192.png",
-    apple: "/icon-192x192.png",
+    icon: "/icon.svg",
+    apple: "/icon.svg",
   },
 }
 
@@ -49,9 +50,9 @@ export default function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="msapplication-TileColor" content="#000000" />
         <meta name="msapplication-tap-highlight" content="no" />
-        <link rel="apple-touch-icon" href="/icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="32x32" href="/icon.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/icon.svg" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="mask-icon" href="/icon.svg" color="#000000" />
         <link rel="shortcut icon" href="/icon.svg" />
@@ -59,11 +60,13 @@ export default function RootLayout({
       <body className={`${urbanist.variable} font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              {children}
-              <Analytics />
-              <PWAInstallPrompt />
-            </Suspense>
+            <AppInitializer>
+              <Suspense fallback={<div>Loading...</div>}>
+                {children}
+                <Analytics />
+                <PWAInstallPrompt />
+              </Suspense>
+            </AppInitializer>
           </AuthProvider>
         </ThemeProvider>
       </body>

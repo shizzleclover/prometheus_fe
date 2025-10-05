@@ -62,9 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Check for stored token on mount
     const storedToken = localStorage.getItem("token")
-    if (storedToken) {
-      setToken(storedToken)
-      fetchCurrentUser(storedToken)
+    const storedUser = localStorage.getItem("user")
+    
+    if (storedToken && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        setToken(storedToken)
+        setUser(userData)
+        setIsLoading(false)
+      } catch (error) {
+        // Invalid stored data, clear it
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        setIsLoading(false)
+      }
     } else {
       setIsLoading(false)
     }
@@ -102,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(mockToken)
     setUser(mockUser)
     localStorage.setItem("token", mockToken)
+    localStorage.setItem("user", JSON.stringify(mockUser))
   }
 
   const register = async (username: string, email: string, password: string) => {
@@ -117,16 +129,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(mockToken)
     setUser(mockUser)
     localStorage.setItem("token", mockToken)
+    localStorage.setItem("user", JSON.stringify(mockUser))
   }
 
   const logout = () => {
     setUser(null)
     setToken(null)
     localStorage.removeItem("token")
+    localStorage.removeItem("user")
   }
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser)
+    localStorage.setItem("user", JSON.stringify(updatedUser))
   }
 
   return (
