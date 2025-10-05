@@ -6,6 +6,7 @@ import { Suspense } from "react"
 import "./globals.css"
 import { AuthProvider } from "@/lib/auth-context"
 import { ThemeProvider } from "@/lib/theme-provider"
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 
 const urbanist = Urbanist({
   subsets: ["latin"],
@@ -17,6 +18,18 @@ export const metadata: Metadata = {
   title: "Prometheus - Unfiltered AI Chat",
   description: "Experience AI conversations without boundaries. Prometheus adapts to you.",
   generator: "v0.app",
+  manifest: "/manifest.json",
+  themeColor: "#000000",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Prometheus",
+  },
+  icons: {
+    icon: "/icon-192x192.png",
+    apple: "/icon-192x192.png",
+  },
 }
 
 export default function RootLayout({
@@ -26,12 +39,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="application-name" content="Prometheus" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Prometheus" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="msapplication-TileColor" content="#000000" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icon-192x192.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="mask-icon" href="/icon.svg" color="#000000" />
+        <link rel="shortcut icon" href="/icon.svg" />
+      </head>
       <body className={`${urbanist.variable} font-sans antialiased`}>
         <ThemeProvider>
           <AuthProvider>
             <Suspense fallback={<div>Loading...</div>}>
               {children}
               <Analytics />
+              <PWAInstallPrompt />
             </Suspense>
           </AuthProvider>
         </ThemeProvider>
