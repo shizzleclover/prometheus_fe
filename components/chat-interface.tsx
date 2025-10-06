@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import { SettingsModal } from "@/components/settings-modal"
 import { useAuthContext } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
+import { ChatService } from "@/lib/api/services/chat.service"
 
 interface Message {
   id: string
@@ -34,8 +35,15 @@ interface Message {
   copied?: boolean
 }
 
+interface ConversationItem {
+  id: string
+  title: string
+  preview: string
+  timestamp: Date
+}
+
 export function ChatInterface() {
-  const { logout } = useAuthContext()
+  const { logout, token } = useAuthContext()
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -55,14 +63,11 @@ export function ChatInterface() {
   const [showSearch, setShowSearch] = useState(false)
   const [textSize, setTextSize] = useState(1)
   const [showScrollButton, setShowScrollButton] = useState(false)
-  const [conversations, setConversations] = useState([
-    { id: 1, title: "Philosophy Discussion", preview: "What is the meaning of life?", timestamp: new Date() },
-    { id: 2, title: "Tech Help", preview: "How do I optimize my code?", timestamp: new Date() },
-    { id: 3, title: "Creative Writing", preview: "Help me write a story about...", timestamp: new Date() },
-    { id: 4, title: "Learning Spanish", preview: "Can you teach me Spanish?", timestamp: new Date() },
-    { id: 5, title: "Career Advice", preview: "What should I do with my career?", timestamp: new Date() },
+  const [conversations, setConversations] = useState<ConversationItem[]>([
+    { id: "conv_seed_1", title: "Philosophy Discussion", preview: "What is the meaning of life?", timestamp: new Date() },
   ])
-  const [activeConversation, setActiveConversation] = useState(1)
+  const [activeConversation, setActiveConversation] = useState<string>("conv_seed_1")
+  const [rateLimitUntil, setRateLimitUntil] = useState<number>(0)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -86,6 +91,12 @@ export function ChatInterface() {
 
   const handleSend = async () => {
     if (!input.trim()) return
+    if (input.length > 2000) return
+    if (!token) {
+      router.push("/login")
+      return
+    }
+    if (Date.now() < rateLimitUntil) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -102,21 +113,30 @@ export function ChatInterface() {
       playSound("send")
     }
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      const res = await ChatService.sendMessage(activeConversation, userMessage.content, token)
       const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `${Date.now()}_bot`,
         role: "bot",
-        content: "This is a demo response. Connect to your backend API to get real responses from Prometheus!",
-        timestamp: new Date(),
+        content: res.reply,
+        timestamp: new Date(res.timestamp),
       }
       setMessages((prev) => [...prev, botMessage])
       setIsTyping(false)
-
-      if (soundEnabled) {
-        playSound("receive")
+      if (soundEnabled) playSound("receive")
+    } catch (err: any) {
+      const msg = (err?.message || "") as string
+      if (msg.toLowerCase().includes("401") || msg.toLowerCase().includes("unauthorized")) {
+        router.push("/login")
+        return
       }
-    }, 2000)
+      if (msg.includes("429") || msg.toLowerCase().includes("rate")) {
+        setRateLimitUntil(Date.now() + 30_000)
+      }
+      // keep user's message; allow retry by not clearing input (we already cleared), so show small error as bot reply
+      setMessages((prev) => [...prev, { id: `${Date.now()}_err`, role: "bot", content: "Error sending. Please try again.", timestamp: new Date() }])
+      setIsTyping(false)
+    }
   }
 
   const playSound = (type: "send" | "receive") => {
@@ -172,8 +192,8 @@ export function ChatInterface() {
   }
 
   const startNewChat = () => {
-    const newId = Math.max(...conversations.map(c => c.id)) + 1
-    const newConversation = {
+    const newId = `conv_${Date.now()}`
+    const newConversation: ConversationItem = {
       id: newId,
       title: "New Chat",
       preview: "Start a new conversation...",
@@ -190,15 +210,21 @@ export function ChatInterface() {
     setInput("")
   }
 
-  const switchConversation = (conversationId: number) => {
+  const switchConversation = async (conversationId: string) => {
     setActiveConversation(conversationId)
-    // In a real app, you'd load the conversation history here
-    setMessages([{
-      id: "1",
-      role: "bot",
-      content: "Hey! I'm Prometheus. I adapt to YOUR personality, beliefs, and style. The more we chat, the better I understand you. What's on your mind?",
-      timestamp: new Date(),
-    }])
+    if (!token) {
+      router.push("/login")
+      return
+    }
+    try {
+      const conv = await ChatService.getConversation(conversationId, token)
+      const mapped: Message[] = conv.messages
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+        .map((m, idx) => ({ id: `${idx}_${new Date(m.timestamp).getTime()}`, role: m.role, content: m.content, timestamp: new Date(m.timestamp) }))
+      setMessages(mapped)
+    } catch (e) {
+      // fallback: keep current messages
+    }
   }
 
   return (

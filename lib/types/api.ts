@@ -101,6 +101,27 @@ export interface SendMessageResponse {
   conversation?: Conversation
 }
 
+// Chat v2 API
+export interface ChatSendResponse {
+  reply: string
+  conversationId: string
+  timestamp: string
+}
+
+export interface ConversationHistoryMessage {
+  role: 'user' | 'bot'
+  content: string
+  timestamp: string
+}
+
+export interface ConversationHistory {
+  conversationId: string
+  userId: string
+  messages: ConversationHistoryMessage[]
+  createdAt: string
+  updatedAt: string
+}
+
 // API Error Types
 export interface ApiError {
   message: string
