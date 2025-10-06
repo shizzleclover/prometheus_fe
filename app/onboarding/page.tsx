@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -80,13 +80,31 @@ export default function OnboardingPage() {
     },
   })
 
-  const handleArrayInput = (field: keyof typeof formData, value: string) => {
-    const array = value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean)
-    setFormData({ ...formData, [field]: array })
-  }
+  // Text state for multi-value fields; parse on submit
+  const [disabilitiesText, setDisabilitiesText] = useState("")
+  const [languagesSpokenText, setLanguagesSpokenText] = useState("")
+  const [sensitivityTopicsText, setSensitivityTopicsText] = useState("")
+  const [culturalIconsYouLoveText, setCulturalIconsYouLoveText] = useState("")
+  const [culturalIconsYouHateText, setCulturalIconsYouHateText] = useState("")
+  const [politicalFiguresYouSupportText, setPoliticalFiguresYouSupportText] = useState("")
+  const [politicalFiguresYouOpposeText, setPoliticalFiguresYouOpposeText] = useState("")
+  const [mediaConsumptionText, setMediaConsumptionText] = useState("")
+  const [hobbiesInterestsText, setHobbiesInterestsText] = useState("")
+
+  useEffect(() => {
+    setDisabilitiesText((formData.disabilities || []).join(", "))
+    setLanguagesSpokenText((formData.languagesSpoken || []).join(", "))
+    setSensitivityTopicsText((formData.sensitivityTopics || []).join(", "))
+    setCulturalIconsYouLoveText((formData.culturalIconsYouLove || []).join(", "))
+    setCulturalIconsYouHateText((formData.culturalIconsYouHate || []).join(", "))
+    setPoliticalFiguresYouSupportText((formData.politicalFiguresYouSupport || []).join(", "))
+    setPoliticalFiguresYouOpposeText((formData.politicalFiguresYouOppose || []).join(", "))
+    setMediaConsumptionText((formData.mediaConsumption || []).join(", "))
+    setHobbiesInterestsText((formData.hobbiesInterests || []).join(", "))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const parseList = (text: string) => text.split(',').map(s => s.trim()).filter(Boolean)
 
   const handleSubmit = async () => {
     setError("")
@@ -96,7 +114,19 @@ export default function OnboardingPage() {
       if (!token) {
         throw new Error("Not authenticated")
       }
-      const response = await UserService.updateDemographics(formData, token)
+      const payload = {
+        ...formData,
+        disabilities: parseList(disabilitiesText),
+        languagesSpoken: parseList(languagesSpokenText),
+        sensitivityTopics: parseList(sensitivityTopicsText),
+        culturalIconsYouLove: parseList(culturalIconsYouLoveText),
+        culturalIconsYouHate: parseList(culturalIconsYouHateText),
+        politicalFiguresYouSupport: parseList(politicalFiguresYouSupportText),
+        politicalFiguresYouOppose: parseList(politicalFiguresYouOpposeText),
+        mediaConsumption: parseList(mediaConsumptionText),
+        hobbiesInterests: parseList(hobbiesInterestsText),
+      }
+      const response = await UserService.updateDemographics(payload, token)
       // Persist demographics to user in memory so app can adapt immediately
       updateUser({ ...(JSON.parse(localStorage.getItem('user') || '{}')), demographics: response.demographics, hasCompletedOnboarding: true })
       router.push("/chat")
@@ -223,8 +253,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="disabilities"
-                    value={formData.disabilities.join(", ")}
-                    onChange={(e) => handleArrayInput("disabilities", e.target.value)}
+                    value={disabilitiesText}
+                    onChange={(e) => setDisabilitiesText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="Optional"
                   />
@@ -311,8 +341,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="languagesSpoken"
-                    value={formData.languagesSpoken.join(", ")}
-                    onChange={(e) => handleArrayInput("languagesSpoken", e.target.value)}
+                    value={languagesSpokenText}
+                    onChange={(e) => setLanguagesSpokenText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="e.g., English, Spanish, French"
                   />
@@ -383,8 +413,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="sensitivityTopics"
-                    value={formData.sensitivityTopics.join(", ")}
-                    onChange={(e) => handleArrayInput("sensitivityTopics", e.target.value)}
+                    value={sensitivityTopicsText}
+                    onChange={(e) => setSensitivityTopicsText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="Topics you're sensitive about"
                   />
@@ -630,8 +660,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="culturalIconsYouLove"
-                    value={formData.culturalIconsYouLove.join(", ")}
-                    onChange={(e) => handleArrayInput("culturalIconsYouLove", e.target.value)}
+                    value={culturalIconsYouLoveText}
+                    onChange={(e) => setCulturalIconsYouLoveText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="e.g., Artists, musicians, thinkers"
                   />
@@ -643,8 +673,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="culturalIconsYouHate"
-                    value={formData.culturalIconsYouHate.join(", ")}
-                    onChange={(e) => handleArrayInput("culturalIconsYouHate", e.target.value)}
+                    value={culturalIconsYouHateText}
+                    onChange={(e) => setCulturalIconsYouHateText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="Optional"
                   />
@@ -657,8 +687,8 @@ export default function OnboardingPage() {
                     </Label>
                     <Input
                       id="politicalFiguresYouSupport"
-                      value={formData.politicalFiguresYouSupport.join(", ")}
-                      onChange={(e) => handleArrayInput("politicalFiguresYouSupport", e.target.value)}
+                      value={politicalFiguresYouSupportText}
+                      onChange={(e) => setPoliticalFiguresYouSupportText(e.target.value)}
                       className="border-4 border-foreground"
                       placeholder="Optional"
                     />
@@ -669,8 +699,8 @@ export default function OnboardingPage() {
                     </Label>
                     <Input
                       id="politicalFiguresYouOppose"
-                      value={formData.politicalFiguresYouOppose.join(", ")}
-                      onChange={(e) => handleArrayInput("politicalFiguresYouOppose", e.target.value)}
+                      value={politicalFiguresYouOpposeText}
+                      onChange={(e) => setPoliticalFiguresYouOpposeText(e.target.value)}
                       className="border-4 border-foreground"
                       placeholder="Optional"
                     />
@@ -684,23 +714,23 @@ export default function OnboardingPage() {
                     </Label>
                     <Input
                       id="mediaConsumption"
-                      value={formData.mediaConsumption.join(", ")}
-                      onChange={(e) => handleArrayInput("mediaConsumption", e.target.value)}
+                      value={mediaConsumptionText}
+                      onChange={(e) => setMediaConsumptionText(e.target.value)}
                       className="border-4 border-foreground"
                       placeholder="e.g., Podcasts, Blogs, News"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="hobbiesInterests" className="font-bold">
-                      Hobbies & Interests (comma-separated)
-                    </Label>
-                    <Input
-                      id="hobbiesInterests"
-                      value={formData.hobbiesInterests.join(", ")}
-                      onChange={(e) => handleArrayInput("hobbiesInterests", e.target.value)}
-                      className="border-4 border-foreground"
-                      placeholder="e.g., Gaming, Reading, Sports"
-                    />
+                  <Label htmlFor="hobbiesInterests" className="font-bold">
+                    Hobbies & Interests (comma-separated)
+                  </Label>
+                  <Input
+                    id="hobbiesInterests"
+                    value={hobbiesInterestsText}
+                    onChange={(e) => setHobbiesInterestsText(e.target.value)}
+                    className="border-4 border-foreground"
+                    placeholder="e.g., Gaming, Reading, Sports"
+                  />
                   </div>
                 </div>
 
@@ -710,8 +740,8 @@ export default function OnboardingPage() {
                   </Label>
                   <Input
                     id="hobbiesInterests"
-                    value={formData.hobbiesInterests.join(", ")}
-                    onChange={(e) => handleArrayInput("hobbiesInterests", e.target.value)}
+                    value={hobbiesInterestsText}
+                    onChange={(e) => setHobbiesInterestsText(e.target.value)}
                     className="border-4 border-foreground"
                     placeholder="e.g., Gaming, Reading, Sports"
                   />

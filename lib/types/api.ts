@@ -122,6 +122,27 @@ export interface ConversationHistory {
   updatedAt: string
 }
 
+export interface CreateConversationResponse {
+  conversationId: string
+  createdAt: string
+}
+
+export interface ListConversationsItem {
+  conversationId: string
+  createdAt: string
+  updatedAt: string
+  messageCount: number
+  lastMessage?: {
+    role: 'user' | 'bot'
+    content: string
+    timestamp: string
+  }
+}
+
+export interface ListConversationsResponse {
+  conversations: ListConversationsItem[]
+}
+
 // API Error Types
 export interface ApiError {
   message: string

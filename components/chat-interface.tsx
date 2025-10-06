@@ -19,6 +19,8 @@ import {
   Plus,
   MessageSquare,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +28,7 @@ import { SettingsModal } from "@/components/settings-modal"
 import { useAuthContext } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import { ChatService } from "@/lib/api/services/chat.service"
+import { useTheme } from "@/lib/theme-provider"
 
 interface Message {
   id: string
@@ -45,6 +48,7 @@ interface ConversationItem {
 export function ChatInterface() {
   const { logout, token } = useAuthContext()
   const router = useRouter()
+  const { theme, toggleTheme } = useTheme()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -63,10 +67,8 @@ export function ChatInterface() {
   const [showSearch, setShowSearch] = useState(false)
   const [textSize, setTextSize] = useState(1)
   const [showScrollButton, setShowScrollButton] = useState(false)
-  const [conversations, setConversations] = useState<ConversationItem[]>([
-    { id: "conv_seed_1", title: "Philosophy Discussion", preview: "What is the meaning of life?", timestamp: new Date() },
-  ])
-  const [activeConversation, setActiveConversation] = useState<string>("conv_seed_1")
+  const [conversations, setConversations] = useState<ConversationItem[]>([])
+  const [activeConversation, setActiveConversation] = useState<string>("")
   const [rateLimitUntil, setRateLimitUntil] = useState<number>(0)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -191,23 +193,23 @@ export function ChatInterface() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const startNewChat = () => {
-    const newId = `conv_${Date.now()}`
-    const newConversation: ConversationItem = {
-      id: newId,
-      title: "New Chat",
-      preview: "Start a new conversation...",
-      timestamp: new Date()
+  const startNewChat = async () => {
+    if (!token) return router.push("/login")
+    try {
+      const { conversationId, createdAt } = await ChatService.createConversation(token)
+      const newConversation: ConversationItem = {
+        id: conversationId,
+        title: "New Chat",
+        preview: "Start a new conversation...",
+        timestamp: new Date(createdAt)
+      }
+      setConversations(prev => [newConversation, ...prev])
+      setActiveConversation(conversationId)
+      setMessages([])
+      setInput("")
+    } catch (e) {
+      // optionally show toast
     }
-    setConversations(prev => [newConversation, ...prev])
-    setActiveConversation(newId)
-    setMessages([{
-      id: "1",
-      role: "bot",
-      content: "Hey! I'm Prometheus. I adapt to YOUR personality, beliefs, and style. The more we chat, the better I understand you. What's on your mind?",
-      timestamp: new Date(),
-    }])
-    setInput("")
   }
 
   const switchConversation = async (conversationId: string) => {
@@ -226,6 +228,32 @@ export function ChatInterface() {
       // fallback: keep current messages
     }
   }
+
+  useEffect(() => {
+    const loadConversations = async () => {
+      if (!token) return
+      try {
+        const { conversations: list } = await ChatService.listConversations(token)
+        const items: ConversationItem[] = list
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+          .map((c) => ({
+            id: c.conversationId,
+            title: c.lastMessage?.content?.slice(0, 30) || 'New Chat',
+            preview: c.lastMessage?.content || '',
+            timestamp: new Date(c.updatedAt),
+          }))
+        setConversations(items)
+        if (!activeConversation && items.length) {
+          setActiveConversation(items[0].id)
+          // Optionally load the latest thread
+          switchConversation(items[0].id)
+        }
+      } catch (e) {
+        // If empty/no conversations, prompt user in UI via empty state below
+      }
+    }
+    loadConversations()
+  }, [token])
 
   return (
     <div className="flex h-screen bg-background">
@@ -251,6 +279,11 @@ export function ChatInterface() {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          {!conversations.length && (
+            <div className="p-4 border-4 border-foreground bg-background text-sm font-bold">
+              No conversations yet. Create a new chat to get started.
+            </div>
+          )}
           {conversations.map((conversation) => (
             <motion.button
               key={conversation.id}
@@ -400,6 +433,16 @@ export function ChatInterface() {
               title="Search messages"
             >
               <Search className="h-5 w-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="border-4 border-foreground"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             <Button
