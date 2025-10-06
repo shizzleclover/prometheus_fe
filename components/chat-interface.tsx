@@ -19,6 +19,8 @@ import {
   Plus,
   MessageSquare,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +28,7 @@ import { SettingsModal } from "@/components/settings-modal"
 import { useAuthContext } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import { ChatService } from "@/lib/api/services/chat.service"
+import { useTheme } from "@/lib/theme-provider"
 
 interface Message {
   id: string
@@ -45,6 +48,7 @@ interface ConversationItem {
 export function ChatInterface() {
   const { logout, token } = useAuthContext()
   const router = useRouter()
+  const { theme, toggleTheme } = useTheme()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -429,6 +433,16 @@ export function ChatInterface() {
               title="Search messages"
             >
               <Search className="h-5 w-5" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="border-4 border-foreground"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             <Button

@@ -123,8 +123,19 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   }, [isOpen, user, empty])
 
   const handleArrayChange = (key: keyof typeof form, value: string) => {
-    const arr = value.split(",").map((s) => s.trim()).filter(Boolean)
-    setForm((prev) => ({ ...prev, [key]: arr as any }))
+    // Allow user to type commas/spaces freely; store raw string temporarily
+    // We'll parse on save to arrays where needed
+    const isArrayField = [
+      'disabilities', 'languagesSpoken', 'sensitivityTopics', 'culturalIconsYouLove', 'culturalIconsYouHate',
+      'politicalFiguresYouSupport', 'politicalFiguresYouOppose', 'mediaConsumption', 'hobbiesInterests',
+    ].includes(key as string)
+    if (isArrayField) {
+      // store as array-like by splitting now but allow empty last token
+      const arr = value.split(',').map(s => s.trim()).filter(Boolean)
+      setForm((prev) => ({ ...prev, [key]: arr as any }))
+    } else {
+      setForm((prev) => ({ ...prev, [key]: value as any }))
+    }
   }
 
   const handleSave = async () => {
@@ -133,7 +144,20 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     setIsSaving(true)
     try {
       if (!token) throw new Error("Not authenticated")
-      const { demographics } = await UserService.putDemographics(form, token)
+      const parse = (txtOrArr: any) => Array.isArray(txtOrArr) ? txtOrArr : String(txtOrArr || '').split(',').map((s) => s.trim()).filter(Boolean)
+      const payload = {
+        ...form,
+        disabilities: parse(form.disabilities),
+        languagesSpoken: parse(form.languagesSpoken),
+        sensitivityTopics: parse(form.sensitivityTopics),
+        culturalIconsYouLove: parse(form.culturalIconsYouLove),
+        culturalIconsYouHate: parse(form.culturalIconsYouHate),
+        politicalFiguresYouSupport: parse(form.politicalFiguresYouSupport),
+        politicalFiguresYouOppose: parse(form.politicalFiguresYouOppose),
+        mediaConsumption: parse(form.mediaConsumption),
+        hobbiesInterests: parse(form.hobbiesInterests),
+      }
+      const { demographics } = await UserService.putDemographics(payload as any, token)
       updateUser({ ...(user as any), demographics })
       setSuccess("Saved!")
       onClose()
