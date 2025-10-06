@@ -236,6 +236,18 @@ export default function OnboardingPage() {
             {currentStep === 2 && (
               <>
                 <div className="space-y-2">
+                  <Label htmlFor="religiousPhilosophy" className="font-bold">
+                    Religious Philosophy
+                  </Label>
+                  <Input
+                    id="religiousPhilosophy"
+                    value={formData.religiousPhilosophy}
+                    onChange={(e) => setFormData({ ...formData, religiousPhilosophy: e.target.value })}
+                    className="border-4 border-foreground"
+                    placeholder="e.g., Humanism, Stoicism"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="religion" className="font-bold">
                     Religion
                   </Label>
@@ -377,6 +389,19 @@ export default function OnboardingPage() {
                     placeholder="Topics you're sensitive about"
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="communicationPreference" className="font-bold">
+                    Communication Preference
+                  </Label>
+                  <Input
+                    id="communicationPreference"
+                    value={formData.communicationPreference}
+                    onChange={(e) => setFormData({ ...formData, communicationPreference: e.target.value })}
+                    className="border-4 border-foreground"
+                    placeholder="e.g., Direct, Diplomatic"
+                  />
+                </div>
               </>
             )}
 
@@ -420,6 +445,263 @@ export default function OnboardingPage() {
                     className="border-4 border-foreground"
                     placeholder="e.g., Progressive, Traditional"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="environmentalStance" className="font-bold">
+                    Environmental Stance
+                  </Label>
+                  <Input
+                    id="environmentalStance"
+                    value={formData.environmentalStance}
+                    onChange={(e) => setFormData({ ...formData, environmentalStance: e.target.value })}
+                    className="border-4 border-foreground"
+                    placeholder="e.g., Pro-environment, Neutral"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="font-bold">Controversial Topic Stances</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Input
+                      id="abortion"
+                      value={formData.controversialTopicStances.abortion}
+                      onChange={(e) => setFormData({ ...formData, controversialTopicStances: { ...formData.controversialTopicStances, abortion: e.target.value } })}
+                      className="border-4 border-foreground"
+                      placeholder="Abortion"
+                    />
+                    <Input
+                      id="guns"
+                      value={formData.controversialTopicStances.guns}
+                      onChange={(e) => setFormData({ ...formData, controversialTopicStances: { ...formData.controversialTopicStances, guns: e.target.value } })}
+                      className="border-4 border-foreground"
+                      placeholder="Guns"
+                    />
+                    <Input
+                      id="immigration"
+                      value={formData.controversialTopicStances.immigration}
+                      onChange={(e) => setFormData({ ...formData, controversialTopicStances: { ...formData.controversialTopicStances, immigration: e.target.value } })}
+                      className="border-4 border-foreground"
+                      placeholder="Immigration"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sexualOrientation" className="font-bold">
+                    Sexual Orientation
+                  </Label>
+                  <Input
+                    id="sexualOrientation"
+                    value={formData.sexualOrientation}
+                    onChange={(e) => setFormData({ ...formData, sexualOrientation: e.target.value })}
+                    className="border-4 border-foreground"
+                    placeholder="Optional"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="relationshipStatus" className="font-bold">
+                      Relationship Status
+                    </Label>
+                    <Input
+                      id="relationshipStatus"
+                      value={formData.relationshipStatus}
+                      onChange={(e) => setFormData({ ...formData, relationshipStatus: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="parentalStatus" className="font-bold">
+                      Parental Status
+                    </Label>
+                    <Input
+                      id="parentalStatus"
+                      value={formData.parentalStatus}
+                      onChange={(e) => setFormData({ ...formData, parentalStatus: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="generationalIdentity" className="font-bold">
+                      Generational Identity
+                    </Label>
+                    <Input
+                      id="generationalIdentity"
+                      value={formData.generationalIdentity}
+                      onChange={(e) => setFormData({ ...formData, generationalIdentity: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Gen Z, Millennial"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="urbanRuralSuburban" className="font-bold">
+                      Urban/Rural/Suburban
+                    </Label>
+                    <Input
+                      id="urbanRuralSuburban"
+                      value={formData.urbanRuralSuburban}
+                      onChange={(e) => setFormData({ ...formData, urbanRuralSuburban: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Urban"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="favoriteHistoricalEra" className="font-bold">
+                      Favorite Historical Era
+                    </Label>
+                    <Input
+                      id="favoriteHistoricalEra"
+                      value={formData.favoriteHistoricalEra}
+                      onChange={(e) => setFormData({ ...formData, favoriteHistoricalEra: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Renaissance"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="leastFavoriteHistoricalEra" className="font-bold">
+                      Least Favorite Historical Era
+                    </Label>
+                    <Input
+                      id="leastFavoriteHistoricalEra"
+                      value={formData.leastFavoriteHistoricalEra}
+                      onChange={(e) => setFormData({ ...formData, leastFavoriteHistoricalEra: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Industrial Revolution"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="historicalFigureResonates" className="font-bold">
+                    Historical Figure You Resonate With
+                  </Label>
+                  <Input
+                    id="historicalFigureResonates"
+                    value={formData.historicalFigureResonates}
+                    onChange={(e) => setFormData({ ...formData, historicalFigureResonates: e.target.value })}
+                    className="border-4 border-foreground"
+                    placeholder="Optional"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="historicalFigureLiked" className="font-bold">
+                      Historical Figure You Like
+                    </Label>
+                    <Input
+                      id="historicalFigureLiked"
+                      value={formData.historicalFigureLiked}
+                      onChange={(e) => setFormData({ ...formData, historicalFigureLiked: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="historicalFigureHated" className="font-bold">
+                      Historical Figure You Dislike
+                    </Label>
+                    <Input
+                      id="historicalFigureHated"
+                      value={formData.historicalFigureHated}
+                      onChange={(e) => setFormData({ ...formData, historicalFigureHated: e.target.value })}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="culturalIconsYouLove" className="font-bold">
+                    Cultural Icons You Love (comma-separated)
+                  </Label>
+                  <Input
+                    id="culturalIconsYouLove"
+                    value={formData.culturalIconsYouLove.join(", ")}
+                    onChange={(e) => handleArrayInput("culturalIconsYouLove", e.target.value)}
+                    className="border-4 border-foreground"
+                    placeholder="e.g., Artists, musicians, thinkers"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="culturalIconsYouHate" className="font-bold">
+                    Cultural Icons You Dislike (comma-separated)
+                  </Label>
+                  <Input
+                    id="culturalIconsYouHate"
+                    value={formData.culturalIconsYouHate.join(", ")}
+                    onChange={(e) => handleArrayInput("culturalIconsYouHate", e.target.value)}
+                    className="border-4 border-foreground"
+                    placeholder="Optional"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="politicalFiguresYouSupport" className="font-bold">
+                      Political Figures You Support (comma-separated)
+                    </Label>
+                    <Input
+                      id="politicalFiguresYouSupport"
+                      value={formData.politicalFiguresYouSupport.join(", ")}
+                      onChange={(e) => handleArrayInput("politicalFiguresYouSupport", e.target.value)}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="politicalFiguresYouOppose" className="font-bold">
+                      Political Figures You Oppose (comma-separated)
+                    </Label>
+                    <Input
+                      id="politicalFiguresYouOppose"
+                      value={formData.politicalFiguresYouOppose.join(", ")}
+                      onChange={(e) => handleArrayInput("politicalFiguresYouOppose", e.target.value)}
+                      className="border-4 border-foreground"
+                      placeholder="Optional"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mediaConsumption" className="font-bold">
+                      Media Consumption (comma-separated)
+                    </Label>
+                    <Input
+                      id="mediaConsumption"
+                      value={formData.mediaConsumption.join(", ")}
+                      onChange={(e) => handleArrayInput("mediaConsumption", e.target.value)}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Podcasts, Blogs, News"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hobbiesInterests" className="font-bold">
+                      Hobbies & Interests (comma-separated)
+                    </Label>
+                    <Input
+                      id="hobbiesInterests"
+                      value={formData.hobbiesInterests.join(", ")}
+                      onChange={(e) => handleArrayInput("hobbiesInterests", e.target.value)}
+                      className="border-4 border-foreground"
+                      placeholder="e.g., Gaming, Reading, Sports"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">

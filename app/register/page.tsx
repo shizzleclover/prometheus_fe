@@ -142,8 +142,8 @@ export default function RegisterPage() {
                 />
                 <label htmlFor="acceptedTermsAndConditions" className="text-sm font-bold">
                   I accept the{" "}
-                  <a href="#" className="text-primary hover:underline">
-                    Terms and Conditions
+                  <a href="/terms" className="text-primary hover:underline">
+                    Terms of Service
                   </a>
                 </label>
               </div>

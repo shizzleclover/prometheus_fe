@@ -18,10 +18,13 @@ import {
   ArrowDown,
   Plus,
   MessageSquare,
+  LogOut,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SettingsModal } from "@/components/settings-modal"
+import { useAuthContext } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 
 interface Message {
   id: string
@@ -32,6 +35,8 @@ interface Message {
 }
 
 export function ChatInterface() {
+  const { logout } = useAuthContext()
+  const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -337,6 +342,30 @@ export function ChatInterface() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                logout()
+                router.push("/login")
+              }}
+              className="border-4 border-foreground font-black hidden sm:flex"
+              title="Log out"
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Logout
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                logout()
+                router.push("/login")
+              }}
+              className="border-4 border-foreground sm:hidden"
+              title="Log out"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

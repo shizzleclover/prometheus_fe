@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   },
   USERS: {
     DEMOGRAPHICS: "/api/users/demographics",
+    PROFILE: "/api/users/profile",
   },
   CHAT: {
     CONVERSATIONS: "/api/chat/conversations",
