@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Flame, Moon, Sun, LogOut } from "lucide-react"
 import Link from "next/link"
 import { useTheme } from "@/lib/theme-provider"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
 
 export function Navigation() {
   const { theme, toggleTheme } = useTheme()
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuthContext()
 
   return (
     <motion.nav

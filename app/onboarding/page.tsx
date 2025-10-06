@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowRight, ArrowLeft, Loader2, CheckCircle2, BookOpen } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
+import { UserService } from "@/lib/api/services/user.service"
+import { handleApiError } from "@/lib/utils/errorHandler"
 
 const STEPS = [
   { id: 1, title: "Basic Info", description: "Tell us about yourself" },
@@ -20,7 +22,7 @@ const STEPS = [
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { token, updateUser } = useAuth()
+  const { token, updateUser } = useAuthContext()
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -37,6 +39,7 @@ export default function OnboardingPage() {
     // Step 2: Cultural Background
     religion: "",
     religiousIntensity: "",
+    religiousPhilosophy: "",
     culturalBackground: "",
     primaryLanguage: "",
     languagesSpoken: [] as string[],
@@ -90,23 +93,15 @@ export default function OnboardingPage() {
     setIsLoading(true)
 
     try {
-      // Mock demographics save - no API calls
-      // Simulate a delay for realistic UX
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Update user with mock data
-      const mockUser = {
-        id: "mock-user-id",
-        username: "mockuser",
-        email: "mock@example.com",
-        hasCompletedOnboarding: true,
-        demographics: formData
+      if (!token) {
+        throw new Error("Not authenticated")
       }
-      
-      updateUser(mockUser)
+      const response = await UserService.updateDemographics(formData, token)
+      // Persist demographics to user in memory so app can adapt immediately
+      updateUser({ ...(JSON.parse(localStorage.getItem('user') || '{}')), demographics: response.demographics, hasCompletedOnboarding: true })
       router.push("/chat")
     } catch (err: any) {
-      setError(err.message || "Failed to save demographics")
+      setError(handleApiError(err))
     } finally {
       setIsLoading(false)
     }

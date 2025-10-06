@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
 import { SplashScreen } from "@/components/splash-screen"
 
 interface AppInitializerProps {
@@ -10,7 +10,7 @@ interface AppInitializerProps {
 }
 
 export function AppInitializer({ children }: AppInitializerProps) {
-  const { user, isLoading } = useAuth()
+  const { user, isLoading } = useAuthContext()
   const router = useRouter()
   const [showSplash, setShowSplash] = useState(true)
   const [shouldRedirect, setShouldRedirect] = useState(false)

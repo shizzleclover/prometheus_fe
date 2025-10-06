@@ -10,16 +10,18 @@ import { Label } from "@/components/ui/label"
 import { Flame, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
+import { handleApiError } from "@/lib/utils/errorHandler"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { register } = useAuth()
+  const { register } = useAuthContext()
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
+    acceptedTermsAndConditions: false,
   })
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -38,13 +40,18 @@ export default function RegisterPage() {
       return
     }
 
+    if (!formData.acceptedTermsAndConditions) {
+      setError("You must accept the terms and conditions")
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      await register(formData.username, formData.email, formData.password)
+      await register(formData.username, formData.email, formData.password, formData.acceptedTermsAndConditions)
       router.push("/onboarding")
     } catch (err: any) {
-      setError(err.message || "Registration failed")
+      setError(handleApiError(err))
     } finally {
       setIsLoading(false)
     }
@@ -122,6 +129,24 @@ export default function RegisterPage() {
                 className="border-4 border-foreground focus:ring-4 focus:ring-primary"
                 placeholder="••••••••"
               />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <input
+                  id="acceptedTermsAndConditions"
+                  type="checkbox"
+                  checked={formData.acceptedTermsAndConditions}
+                  onChange={(e) => setFormData({ ...formData, acceptedTermsAndConditions: e.target.checked })}
+                  className="w-4 h-4 border-4 border-foreground"
+                />
+                <label htmlFor="acceptedTermsAndConditions" className="text-sm font-bold">
+                  I accept the{" "}
+                  <a href="#" className="text-primary hover:underline">
+                    Terms and Conditions
+                  </a>
+                </label>
+              </div>
             </div>
 
             {error && (

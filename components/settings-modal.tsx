@@ -5,7 +5,7 @@ import type React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, User, Globe, Heart, Brain, Sparkles, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -13,7 +13,7 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { user } = useAuth()
+  const { user } = useAuthContext()
 
   // Mock demographic data - in production, this would come from the user profile
   const demographics = {

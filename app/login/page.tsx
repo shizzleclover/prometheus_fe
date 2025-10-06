@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label"
 import { Flame, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/lib/auth-context"
+import { useAuthContext } from "@/lib/auth-context"
+import { handleApiError } from "@/lib/utils/errorHandler"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login } = useAuthContext()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -31,7 +32,7 @@ export default function LoginPage() {
       await login(formData.email, formData.password)
       router.push("/chat")
     } catch (err: any) {
-      setError(err.message || "Login failed")
+      setError(handleApiError(err))
     } finally {
       setIsLoading(false)
     }
