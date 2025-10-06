@@ -71,6 +71,17 @@ export function ChatInterface() {
   const [activeConversation, setActiveConversation] = useState<string>("")
   const [rateLimitUntil, setRateLimitUntil] = useState<number>(0)
 
+  const sanitizeModelText = (text: string): string => {
+    if (!text) return ""
+    let cleaned = text
+      // Remove common special tokens/tags at boundaries
+      .replace(/^(?:\s*(?:<\/?s>|<\/?assistant>|<\/?user>|<\|[^>]*\|>))+/, "")
+      .replace(/(?:<\/?s>|<\/?assistant>|<\/?user>|<\|[^>]*\|>)+\s*$/ , "")
+      // Remove any remaining HTML-like tags
+      .replace(/<[^>]+>/g, "")
+    return cleaned.trim()
+  }
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
@@ -120,7 +131,7 @@ export function ChatInterface() {
       const botMessage: Message = {
         id: `${Date.now()}_bot`,
         role: "bot",
-        content: res.reply,
+        content: sanitizeModelText(res.reply),
         timestamp: new Date(res.timestamp),
       }
       setMessages((prev) => [...prev, botMessage])
@@ -222,7 +233,7 @@ export function ChatInterface() {
       const conv = await ChatService.getConversation(conversationId, token)
       const mapped: Message[] = conv.messages
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-        .map((m, idx) => ({ id: `${idx}_${new Date(m.timestamp).getTime()}`, role: m.role, content: m.content, timestamp: new Date(m.timestamp) }))
+        .map((m, idx) => ({ id: `${idx}_${new Date(m.timestamp).getTime()}`, role: m.role, content: sanitizeModelText(m.content), timestamp: new Date(m.timestamp) }))
       setMessages(mapped)
     } catch (e) {
       // fallback: keep current messages
