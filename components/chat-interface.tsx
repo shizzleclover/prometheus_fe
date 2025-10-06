@@ -70,6 +70,7 @@ export function ChatInterface() {
   const [conversations, setConversations] = useState<ConversationItem[]>([])
   const [activeConversation, setActiveConversation] = useState<string>("")
   const [rateLimitUntil, setRateLimitUntil] = useState<number>(0)
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false)
 
   const sanitizeModelText = (text: string): string => {
     if (!text) return ""
@@ -110,6 +111,7 @@ export function ChatInterface() {
       return
     }
     if (Date.now() < rateLimitUntil) return
+    if (!activeConversation) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -258,6 +260,22 @@ export function ChatInterface() {
           setActiveConversation(items[0].id)
           // Optionally load the latest thread
           switchConversation(items[0].id)
+        } else if (!activeConversation && !items.length) {
+          // No conversations yet: create one upfront to avoid first-hit hiccups
+          try {
+            setIsCreatingConversation(true)
+            const { conversationId, createdAt } = await ChatService.createConversation(token)
+            const newConversation: ConversationItem = {
+              id: conversationId,
+              title: 'New Chat',
+              preview: '',
+              timestamp: new Date(createdAt),
+            }
+            setConversations([newConversation])
+            setActiveConversation(conversationId)
+          } finally {
+            setIsCreatingConversation(false)
+          }
         }
       } catch (e) {
         // If empty/no conversations, prompt user in UI via empty state below
@@ -651,7 +669,7 @@ export function ChatInterface() {
             </div>
             <Button
               onClick={handleSend}
-              disabled={!input.trim()}
+              disabled={!input.trim() || !activeConversation || isCreatingConversation}
               size="icon"
               className="h-[60px] w-[60px] border-4 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             >
